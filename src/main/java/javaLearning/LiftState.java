@@ -3,7 +3,7 @@ package javaLearning;
 
 
 public interface LiftState {
-	public void startForDestination(Lift lift);
-	public void reachDestination(Lift lift);
+	public void fetchNewRequest(Lift lift) throws InterruptedException;
+	public void reachDestination(Lift lift) throws InterruptedException;
 
 }

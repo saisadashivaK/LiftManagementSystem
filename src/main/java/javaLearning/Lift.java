@@ -1,26 +1,45 @@
 package javaLearning;
 
+import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
+import java.util.Formatter;
 
-class Lift {
-	private int liftId;
+class Lift implements Runnable{
+	private Integer liftId;
 	private int currentFloor;
 	public String direction = "NA";
 	private int destinationFloor;
-	public LiftState state;
+	public Formatter outfmt;
+
+	private LiftRequestQueue liftQueue;
+	private LiftState state;
 	public LiftState IDLE;
-	public LiftState IDLE_MOVING_UP;
-	public LiftState IDLE_MOVING_DOWN;
 	public LiftState MOVING_DOWN;
 	public LiftState MOVING_UP;
-	public Lift()
+	public Lift(int liftId, LiftRequestQueue liftQueue) throws FileNotFoundException
 	{
-		this.IDLE = new Idle();
-		this.IDLE_MOVING_UP = new IdleMovingUp();
-		this.IDLE_MOVING_DOWN = new IdleMovingDown();
-		this.MOVING_DOWN = new MovingDown();
-		this.MOVING_UP = new MovingUp();
+		this.liftId = liftId;
+		this.IDLE = new Idle(liftQueue);
+		this.MOVING_DOWN = new MovingDown(liftQueue);
+		this.MOVING_UP = new MovingUp(liftQueue);
+		this.state = this.IDLE;
+		this.liftQueue = liftQueue;
+		this.outfmt = new Formatter(new FileOutputStream(this.liftId.toString() + ".liftout"));
+
+		this.outfmt.format("Lift %2d at floor: %4d%n", this.liftId, this.currentFloor);
+		this.outfmt.flush();
+		System.out.printf("Lift %2d at floor: %4d%n", this.liftId, this.currentFloor);
 	}
 
+	public void finalize()
+	{
+		this.outfmt.close();
+	}
+
+	public void setState(LiftState liftState)
+	{
+		this.state = liftState;
+	}
 	// atomic
 	public void setLiftDirection(String direction)
 	{
@@ -56,7 +75,7 @@ class Lift {
 		return this.currentFloor;
 	}	
 	// atomic
-	public boolean hasReachedDestination()
+	public synchronized boolean hasReachedDestination()
 	{
 		return this.currentFloor == this.destinationFloor;
 	}
@@ -69,20 +88,39 @@ class Lift {
 
 	
 
-	// atomic
-	public void getPreviousDirection()
+	void startLift() throws InterruptedException
 	{
-		return this.direction;
+		while(true){
+			state.fetchNewRequest(this);
+			state.reachDestination(this);
+		}
 	}
 
-	public void startForDestination()
+	void addRequest(LiftRequest request)
 	{
+		this.liftQueue.addRequest(request);
 	}
 
-	public void reachDestination()
-	{
 
+	public Object getLiftId() {
+		// TODO Auto-generated method stub
+		return this.liftId;
 	}
+
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		try{
+			startLift();
+		}catch(InterruptedException e){
+			outfmt.format("Lift - %2d thread failed%n", getLiftId());
+			e.printStackTrace();
+		}
+	}
+
+
+
 
 
 }
