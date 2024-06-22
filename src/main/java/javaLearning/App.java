@@ -2,12 +2,15 @@ package javaLearning;
 
 import java.io.FileNotFoundException;
 
+import javax.sound.sampled.SourceDataLine;
+
 /**
  * Hello world!
  *
  */
 public class App 
 {
+    
 
     static Lift[] lifts;
     static Thread[] liftThreads;
@@ -22,6 +25,7 @@ public class App
     }
     public static void main( String[] args )  throws FileNotFoundException
     {
+        System.out.println("WELCOME TO THE LIFT MANAGEMENT SYSTEM");
         int numLifts = 2;
         initialize(numLifts);
         for(int i = 0; i < lifts.length; i++){
