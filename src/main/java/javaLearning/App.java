@@ -35,8 +35,8 @@ public class App
         }
 
         requestManager = new LiftRequestManager(lifts.length, lifts);
-        System.out.println(args[0]);
-        requestManager.readLiftRequestsFromFile(args[0]);
+        // System.out.println(args[0]);
+        // requestManager.readLiftRequestsFromFile(args[0]);
 
         for(Thread t: liftThreads){
             t.start();
