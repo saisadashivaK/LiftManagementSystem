@@ -35,6 +35,7 @@ public class LiftRequest implements Serializable {
                 repr = repr.replace("TYPE", "FLOOR");
                 break;
         }
+        
         repr = repr.replace("LIFTNUM", liftNumber.toString());
         return repr.replace("DST", destinationFloor.toString());
 
